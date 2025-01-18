@@ -1,0 +1,773 @@
+\usepackage{fontspec}
+\usepackage{mathtools}
+\usepackage{unicode-math}
+\usepackage{tikz}
+\usetikzlibrary{trees}
+\usepackage{mathpartir}
+\usepackage{parskip}
+\usepackage{minted}
+\usepackage{csquotes}
+\usepackage{tcolorbox}
+\usepackage{biblatex} % TODO style w/o quotation marks
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb}
+\usepackage{color,soul}
+\usepackage{xcolor}
+\usepackage{scrextend}
+
+\setmainfont{XITS}
+\setmathfont{XITS Math}
+\setsansfont[Scale=MatchLowercase]{DejaVu Sans}
+\setmonofont[Scale=MatchLowercase]{DejaVu Sans Mono}
+
+\addbibresource{lit.bib}
+
+% Emoji images are from
+% https://github.com/joypixels/emoji-assets/blob/master/png/128
+\newlength{\emojiheight}
+\settoheight{\emojiheight}{H}
+\newcommand{\good}{\includegraphics[height=\emojiheight]{images/1f973}}
+\newcommand{\bad}{\includegraphics[height=\emojiheight]{images/1fae4}}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize item}{\Large\textbullet}
+\setbeamertemplate{itemize subitem}{\Large\textbullet}
+\setbeamertemplate{itemize subsubitem}{\Large\textbullet}
+
+\tcbset{frame empty}
+
+\setminted[lean4]{extrakeywords={aesop cases add aesop? intro simp simp_all only split apply on_goal next rename_i safe unsafe norm constructors forward destruct norm_num done add_aesop_rules rfl subst ext decide}}
+\newmintinline[lean]{lean4}{bgcolor={},ignorelexererrors=true}
+\newminted[leancode]{lean4}{bgcolor={},ignorelexererrors=true,fontsize=\footnotesize,autogobble}
+\BeforeBeginEnvironment{leancode}{\begin{tcolorbox}}
+\AfterEndEnvironment{leancode}{\end{tcolorbox}}
+\usemintedstyle{xcode}
+
+\setlength{\parskip}{1em}
+\setlength{\tabcolsep}{0.5em}
+
+% Source: https://tex.stackexchange.com/questions/55806/mindmap-tikzpicture-in-beamer-reveal-step-by-step/55849#55849
+%
+% Keys to support piece-wise uncovering of elements in TikZ pictures:
+% \node[visible on=<2->](foo){Foo}
+% \node[visible on=<{2,4}>](bar){Bar}   % put braces around comma expressions
+%
+% Internally works by setting opacity=0 when invisible, which has the
+% advantage (compared to \node<2->(foo){Foo} that the node is always there, hence
+% always consumes space plus that coordinate (foo) is always available.
+%
+% The actual command that implements the invisibility can be overridden
+% by altering the style invisible. For instance \tikzsset{invisible/.style={opacity=0.2}}
+% would dim the "invisible" parts. Alternatively, the color might be set to white, if the
+% output driver does not support transparencies (e.g., PS)
+\tikzset{
+  invisible/.style={opacity=0},
+  visible on/.style={alt={#1{}{invisible}}},
+  alt/.code args={<#1>#2#3}{%
+    \alt<#1>{\pgfkeysalso{#2}}{\pgfkeysalso{#3}} % \pgfkeysalso doesn't change the path
+  },
+}
+
+% Source: https://tex.stackexchange.com/questions/102069/make-a-heading-in-beamer
+\newcommand\frameheading[1]{%
+  \par\bigskip
+  {\Large\usebeamercolor[fg]{palette primary}#1}\par\smallskip}
+
+% Colourblind-friendly palette from https://www.nceas.ucsb.edu/sites/default/files/2022-06/Colorblind%20Safe%20Color%20Schemes.pdf
+\definecolor{csgreen}{RGB}{000,158,115}
+\definecolor{csorange}{RGB}{213,094,000}
+\definecolor{csblue}{RGB}{000,114,178}
+\definecolor{cspurple}{RGB}{204,121,167}
+\newcommand{\orange}[1]{\textcolor{csorange}{#1}}
+\newcommand{\blue}[1]{\textcolor{csblue}{#1}}
+\newcommand{\grey}[1]{\textcolor{lightgrey}{#1}}
+\newcommand{\green}[1]{\textcolor{csgreen}{#1}}
+\newcommand{\purple}[1]{\textcolor{cspurple}{#1}}
+
+\setbeamercolor{structure}{fg=csblue}
+
+\renewcommand{\iff}{\leftrightarrow}
+\newcommand{\com}{,\,}
+\renewcommand{\emph}[1]{\orange{#1}}
+\newcommand{\mvar}[1]{\ensuremath{\mathit{?#1}}}
+\newcommand{\rulename}[1]{\textrm{#1}}
+\newcommand{\rulelabel}[1]{\quad \text{\rulename{#1}}}
+\newcommand{\Expr}{\ensuremath{\mathbb{E}}}
+\newcommand{\Hyps}{\ensuremath{\mathbb{H}}}
+\newcommand{\Matches}{\ensuremath{\mathbb{M}}}
+\newcommand{\Slots}{\ensuremath{\mathbb{S}}}
+\newcommand{\Vars}{\ensuremath{\mathbb{V}}}
+\newcommand{\Pow}[1]{\ensuremath{\mathcal{P}(#1)}}
+\newcommand{\dom}[1]{\ensuremath{\mathrm{dom}(#1)}}
+\newcommand{\cod}[1]{\ensuremath{\mathrm{cod}(#1)}}
+\newcommand{\pre}{\ensuremath{\mathrm{pre}}}
+\newcommand{\post}{\ensuremath{\mathrm{post}}}
+
+\begin{document}
+
+\title{Tactic Script Optimisation for Aesop}
+\author{Jannis Limperg\\ University of Munich (LMU)}
+\date{CPP, January 21, 2025, Denver, CO}
+
+\setbeamertemplate{footline}[text line]{\parbox{\textwidth}{\centering \url{https://github.com/JLimperg/talk-2025-01-cpp-aesop-script}\medskip}}
+
+\begin{frame}
+  \maketitle
+\end{frame}
+
+\setbeamertemplate{footline}[text line]{\parbox{\textwidth}{\centering \insertframenumber\medskip}}
+
+\AtBeginSection{
+  \setbeamertemplate{footline}{}
+  \begin{frame}
+    \usebeamercolor[fg]{frametitle}
+    \Large \center{\insertsection}
+  \end{frame}
+  \setbeamertemplate{footline}[text line]{\parbox{\textwidth}{\centering \insertframenumber\medskip}}
+}
+
+\begin{frame}
+  \frametitle{Aesop}
+
+  \begin{itemize}[<+->]
+    \item Tactic for customisable proof search in Lean 4.
+    \item Applies user-specified \emph{rules} to goals.
+    \item Rules are arbitrary tactics.
+    \item If a rule does not fully solve a goal, it produces subgoals.
+    \item Aesop proves the subgoals recursively.
+    \item Broadly similar to Coq \texttt{auto}, Isabelle \texttt{auto}, etc.
+  \end{itemize}
+
+  \pause
+
+  \fullcite{aesop}
+\end{frame}
+
+\setlength{\columnsep}{0pt}
+
+\begin{frame}[fragile,t]
+  \frametitle{Tactic Script Generation}
+
+  \bigskip
+
+  \begin{onlyenv}<1>
+    \begin{leancode}
+      theorem head?_append_of_ne_nil (l₁ l₂ : List α) :
+          l₁ ≠ [] →
+          head? (l₁ ++ l₂) = head? l₁ := by
+        aesop? (add simp head?)
+    \end{leancode}
+  \end{onlyenv}
+
+  \begin{onlyenv}<2>
+    \begin{leancode}
+      theorem head?_append_of_ne_nil (l₁ l₂ : List α) :
+          l₁ ≠ [] →
+          head? (l₁ ++ l₂) = head? l₁ := by
+        intro l₁ l₂ x
+        simp_all only [ne_eq, head?]
+        split
+        next x_1 heq =>
+          simp_all only [append_eq_nil, false_and]
+        next x_1 a as heq =>
+          split
+          next x_2 =>
+            subst heq
+            simp_all only [not_true_eq_false]
+          next x_2 a_1 as_1 =>
+            simp_all only [reduceCtorEq, ...]
+    \end{leancode}
+  \end{onlyenv}
+
+  \begin{onlyenv}<3->
+    \begin{columns}[onlytextwidth]
+      \begin{column}{0.61\textwidth}
+        \begin{leancode}
+          theorem head?_append_of_ne_nil l₁ l₂ :
+              l₁ ≠ [] →
+              head? (l₁ ++ l₂) = head? l₁ := by
+            intro l₁ l₂ x
+            simp_all
+            split
+            rename_i x_1 heq
+            on_goal 2 => rename_i x_1 a as heq
+            simp_all
+            split
+            rename_i x_2
+            on_goal 2 => rename_i x_2 a_1 as_1
+            subst heq
+            simp_all
+            simp_all
+        \end{leancode}
+      \end{column}
+      \begin{column}{0.4\textwidth}
+      \begin{leancode}
+
+
+
+        intro l₁ l₂ x
+        simp_all only [...]
+        split
+        next x_1 heq =>
+          simp_all only [...]
+        next x_1 a as heq =>
+          split
+          next x_2 =>
+            subst heq
+            simp_all only [...]
+          next x_2 a_1 as_1 =>
+            simp_all only [...]
+      \end{leancode}
+      \end{column}
+    \end{columns}
+  \end{onlyenv}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Motivation}
+
+  \begin{itemize}[<+->]
+    \item \emph{Replace Aesop} with the generated script for performance.
+    \item Let Aesop generate a \emph{proof stub}.
+    \item \emph{Learn} how Aesop proved a goal.
+  \end{itemize}
+
+  \pause
+
+  Same methodology could be applied to scripts written by \emph{AI} or even \emph{humans}.
+\end{frame}
+
+\begin{frame}[fragile,t]
+  \frametitle{Script Optimisation Pipeline}
+
+  \bigskip
+
+  \begin{enumerate}[<+->]
+    \item Local dynamic optimisation
+
+          \begin{onlyenv}<1>
+            \begin{minipage}{.2\textwidth}
+              \begin{leancode}
+                simp_all
+              \end{leancode}
+            \end{minipage}
+            \Longrightarrow
+            \begin{minipage}{.35\textwidth}
+              \begin{leancode}
+                simp_all only [...]
+              \end{leancode}
+            \end{minipage}
+          \end{onlyenv}
+
+    \item Structuring
+
+          \begin{onlyenv}<2>
+            \begin{minipage}{.42\textwidth}
+              \begin{leancode}
+                split
+                rename_i x_1 heq
+                on_goal 2 =>
+                  rename_i x_1 a as heq
+                simp_all only [...]
+                split
+              \end{leancode}
+            \end{minipage}
+            \Longrightarrow
+            \begin{minipage}{.42\textwidth}
+              \begin{leancode}
+                split
+                · rename_i x_1 heq
+                  simp_all only [...]
+                · rename_i x_1 a as heq
+                  split
+              \end{leancode}
+            \end{minipage}
+          \end{onlyenv}
+
+    \item Global static optimisation
+
+          \begin{onlyenv}<3>
+            \begin{minipage}{.4\textwidth}
+              \begin{leancode}
+                · rename_i x₁ ... xₙ
+                  ...
+              \end{leancode}
+            \end{minipage}
+            \Longrightarrow
+            \begin{minipage}{.4\textwidth}
+              \begin{leancode}
+                next x₁ ... xₙ ⇒ ...
+              \end{leancode}
+            \end{minipage}
+          \end{onlyenv}
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Background: Metavariables}
+
+  a.k.a.\ existential variables, schematic variables, free variables
+
+  $λ (x~y : ℕ),\; x + y = \mvar{z}$
+
+  \pause
+
+  $\mvar{z}$ is a \emph{hole} in the term.
+
+  \pause
+
+  $\mvar{z}$ is \emph{typed}: $x, y : ℕ ⊢ \mvar{z} : ℕ$
+
+  \pause
+
+  \emph{Assigning} e.g.\ $\mvar{z} ≔ 0$ changes the term:
+  \[
+    λ (x~y : ℕ),\; x + y = 0
+  \]
+
+  \pause
+
+  We can also view $\mvar{z}$ as a \emph{goal} of type $ℕ$ with hypotheses $x, y : ℕ$.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Optimiser Input}
+
+  \begin{definition}[Script step]
+    $(Φ^{\pre}, g^{\pre}, t, Φ^{\post}, G^{\post})$ where
+
+    \medskip
+
+    \begin{itemize}
+      \item $t$: tactic syntax (or tactic sequence syntax)
+      \item $Φ^{\pre}$: metavariable state before $t$
+      \item $g^{\pre}$: goal before $t$
+      \item $Φ^{\post}$: metavariable state before $t$
+      \item $G^{\post}$: goals after $t$
+    \end{itemize}
+  \end{definition}
+
+  \begin{definition}[Naive script]
+    List of script steps
+  \end{definition}
+\end{frame}
+
+\section{Local Dynamic Optimisation}
+
+\begin{frame}[fragile]
+  \frametitle{Example}
+
+  \begin{minipage}{.2\textwidth}
+    \begin{leancode}
+      simp_all
+    \end{leancode}
+  \end{minipage}
+  \Longrightarrow
+  \begin{minipage}{.5\textwidth}
+    \begin{leancode}
+      simp_all only [ne_eq, head?]
+    \end{leancode}
+  \end{minipage}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Multi-Steps}
+
+  \begin{definition}[Multi-step]
+    $(Φ^{\pre}, g^{\pre}, [t₁, \dots, tₙ], Φ^{\post}, G^{\post})$ where
+    \medskip
+    \begin{itemize}
+      \item $t₁, \dots, tₙ$: tactic syntaxes
+    \end{itemize}
+  \end{definition}
+
+  \pause
+
+  For \lean{simp_all}: multi-step with tactics
+  \begin{itemize}
+    \item \lean{simp_all only [thm₁, ..., thmₘ]}
+    \item \lean{simp_all}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Local Dynamic Optimisation}
+
+  Given multi-step $(Φ^{\pre}, g^{\pre}, [t₁, \dots, tₙ], Φ^{\post}, G^{\post})$:
+
+  Use the \emph{first} tactic $tᵢ$ such that $tᵢ$, when run in state $Φ^{\pre}$ on goal $g^{\pre}$, produces state $Φ^{\post}$ and goals $G^{\post}$.
+
+  \pause
+
+  The \emph{last} tactic $tₙ$ is assumed to satisfy this property and acts as a \emph{fallback}.
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Goal Equality Up To Renaming}
+
+  \begin{block}{Problem}
+    Internal names of hypotheses and metavariables are unpredictable.
+
+    \begin{minipage}{.3\textwidth}
+      \begin{leancode}
+        l₁ l₂ : List α
+        x : l₁ ≠ []
+        ⊢ ...
+      \end{leancode}
+    \end{minipage}
+    \Longrightarrow % TODO t₁
+    \begin{minipage}{.5\textwidth}
+      \begin{onlyenv}<1>
+        \begin{leancode}
+          l₁ l₂ : List α
+          x : ¬l₁ = []
+          ⊢ ...
+        \end{leancode}
+      \end{onlyenv}
+      \begin{onlyenv}<2->
+        \begin{leancode}
+          _uniq.1 _uniq.2 : List α
+          _uniq.3 : ¬_uniq.1 = []
+          ⊢ ...
+        \end{leancode}
+      \end{onlyenv}
+    \end{minipage}
+
+    \begin{minipage}{.3\textwidth}
+      \begin{leancode}
+        l₁ l₂ : List α
+        x : l₁ ≠ []
+        ⊢ ...
+      \end{leancode}
+    \end{minipage}
+    \Longrightarrow % TODO t₂
+    \begin{minipage}{.5\textwidth}
+      \begin{onlyenv}<1>
+        \begin{leancode}
+          l₁ l₂ : List α
+          x : ¬l₁ = []
+          ⊢ ...
+        \end{leancode}
+      \end{onlyenv}
+      \begin{onlyenv}<2->
+        \begin{leancode}
+          _uniq.4 _uniq.5 : List α
+          _uniq.6 : ¬_uniq.4 = []
+          ⊢ ...
+        \end{leancode}
+      \end{onlyenv}
+    \end{minipage}
+  \end{block}
+
+  \begin{onlyenv}<3>
+    \begin{block}{Solution}
+      Compare goals up to renaming.
+    \end{block}
+  \end{onlyenv}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Goal Equality Up To Renaming}
+
+  % TODO highlight types
+  \begin{columns}[onlytextwidth]
+    \begin{column}{.5\textwidth}
+      \begin{leancode}
+        _uniq.1 _uniq.2 : List α
+        _uniq.3 : ¬_uniq.1 = []
+        ⊢ ...
+      \end{leancode}
+    \end{column}
+    \begin{column}{.5\textwidth}
+      \begin{leancode}
+        _uniq.4 _uniq.5 : List α
+        _uniq.6 : ¬_uniq.4 = []
+        ⊢ ...
+      \end{leancode}
+    \end{column}
+  \end{columns}
+
+  \bigskip
+
+  \begin{center}
+    \visible<2->{\lean{_uniq.1} ↦ \lean{_uniq.4}\\}
+    \visible<3->{\lean{_uniq.2} ↦ \lean{_uniq.5}\\}
+    \visible<4->{\lean{_uniq.3} ↦ \lean{_uniq.6}\\}
+  \end{center}
+\end{frame}
+
+\section{Structuring}
+
+\begin{frame}[fragile]
+  \frametitle{Reordering}
+
+  \begin{block}{Problem}
+    Aesop may solve the goals in an unnatural order.
+  \end{block}
+
+  \pause
+
+  \begin{block}{Solution}
+    Reorder the tactics so that they are applied in depth-first order.
+  \end{block}
+
+  \pause
+
+  \begin{columns}[onlytextwidth]
+    % TODO highlight moving parts
+    \begin{column}{.58\textwidth}
+      \begin{leancode}
+        intro l₁ l₂ x
+        simp_all
+        split
+        rename_i x_1 heq
+        on_goal 2 => rename_i x_1 a as heq
+        simp_all
+        split
+        rename_i x_2
+        on_goal 2 => rename_i x_2 a_1 as_1
+        subst heq
+        simp_all
+        simp_all
+      \end{leancode}
+    \end{column}
+    \begin{column}{.4\textwidth}
+      \begin{leancode}
+        intro l₁ l₂ x
+        simp_all
+        split
+        rename_i x_1 heq
+        simp_all
+        rename_i x_1 a as heq
+        split
+        rename_i x_2
+        subst heq
+        simp_all
+        rename_i x_2 a_1 as_1
+        simp_all
+      \end{leancode}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Reordering With Metavariables}
+
+  \begin{block}{Problem}
+    Reordering is \emph{unsound} in general when goals contain \emph{shared metavariables}.
+  \end{block}
+
+  \pause
+
+  \begin{block}{In tactic state...}
+    \begin{leancode}
+      ⊢ ?n < 42
+
+      ⊢ ?n = 0
+    \end{leancode}
+  \end{block}
+
+  \pause
+
+  \begin{columns}[onlytextwidth]
+    \begin{column}{.45\textwidth}
+      \begin{block}{... this works}
+        \begin{leancode}
+          on_goal 2 => rfl
+          decide
+        \end{leancode}
+      \end{block}
+    \end{column}
+    \pause
+    \begin{column}{.45\textwidth}
+      \begin{block}{... this doesn't}
+        \begin{leancode}
+          decide
+          rfl
+        \end{leancode}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Static Reordering}
+
+  \begin{block}{Tactic State}
+    \begin{onlyenv}<1>
+      \begin{leancode}
+        ⊢ True ∧ ∃ x, 1 = x ∧ x = 1
+
+
+      \end{leancode}
+    \end{onlyenv}
+    \begin{onlyenv}<2>
+      \begin{leancode}
+        ⊢ True
+
+        ⊢ ∃ x, 1 = x ∧ x = 1
+      \end{leancode}
+    \end{onlyenv}
+    \begin{onlyenv}<3>
+      \begin{leancode}
+        ⊢ ∃ x, 1 = x ∧ x = 1
+
+
+      \end{leancode}
+    \end{onlyenv}
+    \begin{onlyenv}<4>
+      \begin{leancode}
+        ⊢ 1 = ?x ∧ ?x = 1
+
+
+      \end{leancode}
+    \end{onlyenv}
+    \begin{onlyenv}<5>
+      \begin{leancode}
+        ⊢ 1 = ?x
+
+        ⊢ ?x = 1
+      \end{leancode}
+    \end{onlyenv}
+    \begin{onlyenv}<6>
+      \begin{leancode}
+        ⊢ 1 = 1
+
+
+      \end{leancode}
+    \end{onlyenv}
+    \begin{onlyenv}<7>
+      \begin{leancode}
+        ✓
+
+
+      \end{leancode}
+    \end{onlyenv}
+  \end{block}
+
+  \begin{columns}[onlytextwidth,t]
+    \begin{column}{.6\textwidth}
+      \begin{block}{Original Script}
+        \begin{tcolorbox}
+          \small
+          \lean{apply And.intro} \\
+          \lean{on_goal 2 => apply Exists.intro} \\
+          \lean{apply True.intro} \\
+          \lean{apply And.intro} \\
+          \lean{on_goal 2 => rfl} \\
+          \lean{rfl}
+        \end{tcolorbox}
+      \end{block}
+    \end{column}
+
+    \begin{column}{.38\textwidth}
+      \begin{block}{Reordered Script}
+        \begin{tcolorbox}
+          \small
+          \visible<2->{\lean{apply And.intro}} \\
+          \visible<3->{\lean{apply True.intro}} \\
+          \visible<4->{\lean{apply Exists.intro}} \\
+          \visible<5->{\lean{apply And.intro}} \\
+          \visible<6->{\lean{on_goal 2 => rfl}} \\
+          \visible<7->{\lean{rfl}}
+        \end{tcolorbox}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Dynamic Reordering}
+
+  \begin{block}{Tactic State}
+    \begin{onlyenv}<1>
+      \begin{leancode}
+        ⊢ 1 = ?x
+
+        ⊢ ?x = 1
+      \end{leancode}
+    \end{onlyenv}
+    \begin{onlyenv}<2>
+      \begin{leancode}
+        ⊢ 1 = 1
+
+
+      \end{leancode}
+    \end{onlyenv}
+    \begin{onlyenv}<3>
+      \begin{leancode}
+        ✓
+
+
+      \end{leancode}
+    \end{onlyenv}
+  \end{block}
+
+  \begin{columns}[onlytextwidth,t]
+    \begin{column}{.6\textwidth}
+      \begin{block}{Original Script}
+        \begin{tcolorbox}
+          \small
+          \lean{apply And.intro} \\
+          \lean{on_goal 2 => apply Exists.intro} \\
+          \lean{apply True.intro} \\
+          \lean{apply And.intro} \\
+          \lean{on_goal 2 => rfl} \\
+          \lean{rfl}
+        \end{tcolorbox}
+      \end{block}
+    \end{column}
+
+    \begin{column}{.38\textwidth}
+      \begin{block}{Reordered Script}
+        \begin{tcolorbox}
+          \small
+          \lean{apply And.intro} \\
+          \lean{apply True.intro} \\
+          \lean{apply Exists.intro} \\
+          \lean{apply And.intro} \\
+          \visible<2->{\lean{rfl}} \\
+          \visible<3->{\lean{rfl}}
+        \end{tcolorbox}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Global Static Optimisation}
+
+\begin{frame}[fragile]
+  \frametitle{Global Static Optimisation}
+
+  Two syntactic optimisation passes:
+
+  \begin{block}{Pass 1}
+    \medskip
+    \begin{minipage}{.4\textwidth}
+      \begin{leancode}
+        · rename_i x₁ ... xₙ
+          ...
+      \end{leancode}
+    \end{minipage}
+    \Longrightarrow
+    \begin{minipage}{.4\textwidth}
+      \begin{leancode}
+        next x₁ ... xₙ ⇒ ...
+      \end{leancode}
+    \end{minipage}
+  \end{block}
+
+  \pause
+
+  \begin{block}{Pass 2}
+    Remove \lean{rename_i x₁ ... xₙ} at the start of the proof if \lean{x₁, ..., xₙ} don't occur in the remainder of the proof.
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \centering{\Huge{\blue{Thanks!}}}
+  % TODO Links/QR codes for these slides, Aesop repo, my CV
+\end{frame}
+
+\end{document}
