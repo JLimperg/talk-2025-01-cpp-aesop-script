@@ -51,7 +51,7 @@
 
 \setminted[lean4]{extrakeywords={aesop cases add aesop? intro simp simp_all only split apply on_goal next rename_i safe unsafe norm constructors forward destruct norm_num done add_aesop_rules rfl subst ext decide}}
 \newmintinline[lean]{lean4}{bgcolor={},ignorelexererrors=true}
-\newminted[leancode]{lean4}{bgcolor={},ignorelexererrors=true,fontsize=\footnotesize,autogobble,escapeinside=||,beameroverlays,highlightcolor=csyellow}
+\newminted[leancode]{lean4}{bgcolor={},ignorelexererrors=true,fontsize=\footnotesize,autogobble,beameroverlays,highlightcolor=csyellow}
 \BeforeBeginEnvironment{leancode}{\begin{tcolorbox}}
 \AfterEndEnvironment{leancode}{\end{tcolorbox}}
 \usemintedstyle{xcode}
@@ -244,7 +244,7 @@
       \end{column}
       \begin{column}{0.45\textwidth}
         \begin{onlyenv}<3-4>
-          \begin{leancode}[escapeinside=false]
+          \begin{leancode}
 
 
 
@@ -263,7 +263,7 @@
           \end{leancode}
         \end{onlyenv}
         \begin{onlyenv}<5>
-          \begin{leancode}[escapeinside=false,highlightlines={5,8,13,15}]
+          \begin{leancode}[highlightlines={5,8,13,15}]
 
 
 
