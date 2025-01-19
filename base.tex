@@ -147,7 +147,7 @@
 \setlength{\columnsep}{0pt}
 
 \begin{frame}[fragile,t]
-  \frametitle{Tactic Script Generation}
+  \frametitle{Tactic Script \alt<3->{\orange{Optimisation}}{Generation}}
 
   \bigskip
 
@@ -181,44 +181,105 @@
   \end{onlyenv}
 
   \begin{onlyenv}<3->
-    \begin{columns}[onlytextwidth]
-      \begin{column}{0.61\textwidth}
-        \begin{leancode}
-          theorem head?_append_of_ne_nil l₁ l₂ :
-              l₁ ≠ [] →
-              head? (l₁ ++ l₂) = head? l₁ := by
-            intro l₁ l₂ x
-            simp_all
-            split
-            rename_i x_1 heq
-            on_goal 2 => rename_i x_1 a as heq
-            simp_all
-            split
-            rename_i x_2
-            on_goal 2 => rename_i x_2 a_1 as_1
-            subst heq
-            simp_all
-            simp_all
-        \end{leancode}
+    \begin{columns}
+      \begin{column}{0.65\textwidth}
+        \begin{onlyenv}<3>
+          \begin{leancode}
+            theorem head?_append_of_ne_nil l₁ l₂ :
+                l₁ ≠ [] →
+                head? (l₁ ++ l₂) = head? l₁ := by
+              intro l₁ l₂ x
+              simp_all
+              split
+              rename_i x_1 heq
+              on_goal 2 => rename_i x_1 a as heq
+              simp_all
+              split
+              rename_i x_2
+              on_goal 2 => rename_i x_2 a_1 as_1
+              subst heq
+              simp_all
+              simp_all
+          \end{leancode}
+        \end{onlyenv}
+        \begin{onlyenv}<4>
+          \begin{leancode}[highlightlines={8,12}]
+            theorem head?_append_of_ne_nil l₁ l₂ :
+                l₁ ≠ [] →
+                head? (l₁ ++ l₂) = head? l₁ := by
+              intro l₁ l₂ x
+              simp_all
+              split
+              rename_i x_1 heq
+              on_goal 2 => rename_i x_1 a as heq
+              simp_all
+              split
+              rename_i x_2
+              on_goal 2 => rename_i x_2 a_1 as_1
+              subst heq
+              simp_all
+              simp_all
+          \end{leancode}
+        \end{onlyenv}
+        \begin{onlyenv}<5>
+          \begin{leancode}[highlightlines={5,9,14,15}]
+            theorem head?_append_of_ne_nil l₁ l₂ :
+                l₁ ≠ [] →
+                head? (l₁ ++ l₂) = head? l₁ := by
+              intro l₁ l₂ x
+              simp_all
+              split
+              rename_i x_1 heq
+              on_goal 2 => rename_i x_1 a as heq
+              simp_all
+              split
+              rename_i x_2
+              on_goal 2 => rename_i x_2 a_1 as_1
+              subst heq
+              simp_all
+              simp_all
+          \end{leancode}
+        \end{onlyenv}
       \end{column}
-      \begin{column}{0.4\textwidth}
-      \begin{leancode}
+      \begin{column}{0.45\textwidth}
+        \begin{onlyenv}<3-4>
+          \begin{leancode}[escapeinside=false]
 
 
 
-        intro l₁ l₂ x
-        simp_all only [...]
-        split
-        next x_1 heq =>
-          simp_all only [...]
-        next x_1 a as heq =>
-          split
-          next x_2 =>
-            subst heq
+            intro l₁ l₂ x
             simp_all only [...]
-          next x_2 a_1 as_1 =>
+            split
+            next x_1 heq =>
+              simp_all only [...]
+            next x_1 a as heq =>
+              split
+              next x_2 =>
+                subst heq
+                simp_all only [...]
+              next x_2 a_1 as_1 =>
+                simp_all only [...]
+          \end{leancode}
+        \end{onlyenv}
+        \begin{onlyenv}<5>
+          \begin{leancode}[escapeinside=false,highlightlines={5,8,13,15}]
+
+
+
+            intro l₁ l₂ x
             simp_all only [...]
-      \end{leancode}
+            split
+            next x_1 heq =>
+              simp_all only [...]
+            next x_1 a as heq =>
+              split
+              next x_2 =>
+                subst heq
+                simp_all only [...]
+              next x_2 a_1 as_1 =>
+                simp_all only [...]
+          \end{leancode}
+        \end{onlyenv}
       \end{column}
     \end{columns}
   \end{onlyenv}
