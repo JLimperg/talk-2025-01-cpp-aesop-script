@@ -802,8 +802,6 @@
 \begin{frame}[fragile]
   \frametitle{Global Static Optimisation}
 
-  Two syntactic optimisation passes:
-
   \begin{block}{Pass 1}
     \medskip
     \begin{minipage}{.4\textwidth}
@@ -820,7 +818,7 @@
     \end{minipage}
   \end{block}
 
-  \pause
+  \pause\bigskip
 
   \begin{block}{Pass 2}
     Remove \lean{rename_i x₁ ... xₙ} at the start of the proof if \lean{x₁, ..., xₙ} don't occur in the remainder of the proof.
