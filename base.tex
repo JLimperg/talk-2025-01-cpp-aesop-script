@@ -711,29 +711,141 @@
   \begin{columns}[onlytextwidth,t]
     \begin{column}{.6\textwidth}
       \begin{block}{Original Script}
-        \begin{tcolorbox}
-          \small
-          \lean{apply And.intro} \\
-          \lean{on_goal 2 => apply Exists.intro} \\
-          \lean{apply True.intro} \\
-          \lean{apply And.intro} \\
-          \lean{on_goal 2 => rfl} \\
-          \lean{rfl}
-        \end{tcolorbox}
+        \begin{onlyenv}<1>
+          \begin{leancode}
+            apply And.intro
+            on_goal 2 => apply Exists.intro
+            apply True.intro
+            apply And.intro
+            on_goal 2 => rfl
+            rfl
+          \end{leancode}
+        \end{onlyenv}
+        \begin{onlyenv}<2>
+          \begin{leancode}[highlightlines=1]
+            apply And.intro
+            on_goal 2 => apply Exists.intro
+            apply True.intro
+            apply And.intro
+            on_goal 2 => rfl
+            rfl
+          \end{leancode}
+        \end{onlyenv}
+        \begin{onlyenv}<3>
+          \begin{leancode}[highlightlines=3]
+            apply And.intro
+            on_goal 2 => apply Exists.intro
+            apply True.intro
+            apply And.intro
+            on_goal 2 => rfl
+            rfl
+          \end{leancode}
+        \end{onlyenv}
+        \begin{onlyenv}<4>
+          \begin{leancode}[highlightlines=2]
+            apply And.intro
+            on_goal 2 => apply Exists.intro
+            apply True.intro
+            apply And.intro
+            on_goal 2 => rfl
+            rfl
+          \end{leancode}
+        \end{onlyenv}
+        \begin{onlyenv}<5>
+          \begin{leancode}[highlightlines=4]
+            apply And.intro
+            on_goal 2 => apply Exists.intro
+            apply True.intro
+            apply And.intro
+            on_goal 2 => rfl
+            rfl
+          \end{leancode}
+        \end{onlyenv}
+        \begin{onlyenv}<6>
+          \begin{leancode}[highlightlines=5]
+            apply And.intro
+            on_goal 2 => apply Exists.intro
+            apply True.intro
+            apply And.intro
+            on_goal 2 => rfl
+            rfl
+          \end{leancode}
+        \end{onlyenv}
+        \begin{onlyenv}<7->
+          \begin{leancode}[highlightlines=6]
+            apply And.intro
+            on_goal 2 => apply Exists.intro
+            apply True.intro
+            apply And.intro
+            on_goal 2 => rfl
+            rfl
+          \end{leancode}
+        \end{onlyenv}
       \end{block}
     \end{column}
 
     \begin{column}{.38\textwidth}
       \begin{block}{Reordered Script}
-        \begin{tcolorbox}
-          \small
-          \visible<2->{\lean{apply And.intro}} \\
-          \visible<3->{\lean{apply True.intro}} \\
-          \visible<4->{\lean{apply Exists.intro}} \\
-          \visible<5->{\lean{apply And.intro}} \\
-          \visible<6->{\lean{on_goal 2 => rfl}} \\
-          \visible<7->{\lean{rfl}}
-        \end{tcolorbox}
+        \begin{onlyenv}<2>
+          \begin{leancode}[highlightlines=1]
+            apply And.intro
+
+
+
+
+
+          \end{leancode}
+        \end{onlyenv}
+        \begin{onlyenv}<3>
+          \begin{leancode}[highlightlines=2]
+            apply And.intro
+            apply True.intro
+
+
+
+
+          \end{leancode}
+        \end{onlyenv}
+        \begin{onlyenv}<4>
+          \begin{leancode}[highlightlines=3]
+            apply And.intro
+            apply True.intro
+            apply Exists.intro
+
+
+
+          \end{leancode}
+        \end{onlyenv}
+        \begin{onlyenv}<5>
+          \begin{leancode}[highlightlines=4]
+            apply And.intro
+            apply True.intro
+            apply Exists.intro
+            apply And.intro
+
+
+          \end{leancode}
+        \end{onlyenv}
+        \begin{onlyenv}<6>
+          \begin{leancode}[highlightlines=5]
+            apply And.intro
+            apply True.intro
+            apply Exists.intro
+            apply And.intro
+            on_goal 2 => rfl
+
+          \end{leancode}
+        \end{onlyenv}
+        \begin{onlyenv}<7->
+          \begin{leancode}[highlightlines=6]
+            apply And.intro
+            apply True.intro
+            apply Exists.intro
+            apply And.intro
+            on_goal 2 => rfl
+            rfl
+          \end{leancode}
+        \end{onlyenv}
       \end{block}
     \end{column}
   \end{columns}
@@ -769,29 +881,71 @@
   \begin{columns}[onlytextwidth,t]
     \begin{column}{.6\textwidth}
       \begin{block}{Original Script}
-        \begin{tcolorbox}
-          \small
-          \lean{apply And.intro} \\
-          \lean{on_goal 2 => apply Exists.intro} \\
-          \lean{apply True.intro} \\
-          \lean{apply And.intro} \\
-          \lean{on_goal 2 => rfl} \\
-          \lean{rfl}
-        \end{tcolorbox}
+        \begin{onlyenv}<1>
+          \begin{leancode}
+            apply And.intro
+            on_goal 2 => apply Exists.intro
+            apply True.intro
+            apply And.intro
+            on_goal 2 => rfl
+            rfl
+          \end{leancode}
+        \end{onlyenv}
+        \begin{onlyenv}<2>
+          \begin{leancode}[highlightlines=6]
+            apply And.intro
+            on_goal 2 => apply Exists.intro
+            apply True.intro
+            apply And.intro
+            on_goal 2 => rfl
+            rfl
+          \end{leancode}
+        \end{onlyenv}
+        \begin{onlyenv}<3->
+          \begin{leancode}[highlightlines=5]
+            apply And.intro
+            on_goal 2 => apply Exists.intro
+            apply True.intro
+            apply And.intro
+            on_goal 2 => rfl
+            rfl
+          \end{leancode}
+        \end{onlyenv}
       \end{block}
     \end{column}
 
     \begin{column}{.38\textwidth}
       \begin{block}{Reordered Script}
-        \begin{tcolorbox}
-          \small
-          \lean{apply And.intro} \\
-          \lean{apply True.intro} \\
-          \lean{apply Exists.intro} \\
-          \lean{apply And.intro} \\
-          \visible<2->{\lean{rfl}} \\
-          \visible<3->{\lean{rfl}}
-        \end{tcolorbox}
+        \begin{onlyenv}<1>
+          \begin{leancode}
+            apply And.intro
+            apply True.intro
+            apply Exists.intro
+            apply And.intro
+
+
+          \end{leancode}
+        \end{onlyenv}
+        \begin{onlyenv}<2>
+          \begin{leancode}[highlightlines=5]
+            apply And.intro
+            apply True.intro
+            apply Exists.intro
+            apply And.intro
+            rfl
+
+          \end{leancode}
+        \end{onlyenv}
+        \begin{onlyenv}<3->
+          \begin{leancode}[highlightlines=6]
+            apply And.intro
+            apply True.intro
+            apply Exists.intro
+            apply And.intro
+            rfl
+            rfl
+          \end{leancode}
+        \end{onlyenv}
       \end{block}
     \end{column}
   \end{columns}
