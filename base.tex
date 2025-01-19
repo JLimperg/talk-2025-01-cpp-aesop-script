@@ -45,7 +45,6 @@
 \definecolor{csyellow}{RGB}{240,228,066}
 \newcommand{\orange}[1]{\textcolor{csorange}{#1}}
 \newcommand{\blue}[1]{\textcolor{csblue}{#1}}
-\newcommand{\grey}[1]{\textcolor{lightgrey}{#1}}
 \newcommand{\green}[1]{\textcolor{csgreen}{#1}}
 \newcommand{\purple}[1]{\textcolor{cspurple}{#1}}
 
@@ -347,7 +346,7 @@
             \end{minipage}
           \end{onlyenv}
 
-    \item Global static optimisation
+    \item Global static optimisation \purple{(not covered here)}
 
           \begin{onlyenv}<3>
             \begin{minipage}{.4\textwidth}
@@ -949,34 +948,6 @@
       \end{block}
     \end{column}
   \end{columns}
-\end{frame}
-
-\section{Global Static Optimisation}
-
-\begin{frame}[fragile]
-  \frametitle{Global Static Optimisation}
-
-  \begin{block}{Pass 1}
-    \medskip
-    \begin{minipage}{.4\textwidth}
-      \begin{leancode}
-        · rename_i x₁ ... xₙ
-          ...
-      \end{leancode}
-    \end{minipage}
-    \Longrightarrow
-    \begin{minipage}{.4\textwidth}
-      \begin{leancode}
-        next x₁ ... xₙ ⇒ ...
-      \end{leancode}
-    \end{minipage}
-  \end{block}
-
-  \pause\bigskip
-
-  \begin{block}{Pass 2}
-    Remove \lean{rename_i x₁ ... xₙ} at the start of the proof if \lean{x₁, ..., xₙ} don't occur in the remainder of the proof.
-  \end{block}
 \end{frame}
 
 \begin{frame}
