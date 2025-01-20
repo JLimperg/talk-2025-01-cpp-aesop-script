@@ -666,27 +666,41 @@
   \pause
 
   \begin{block}{In tactic state...}
-    \begin{leancode}
-      ⊢ ?n < 42
+    \begin{onlyenv}<2,5->
+      \begin{leancode}
+        ⊢ ?n < 42
 
-      ⊢ ?n = 0
-    \end{leancode}
+        ⊢ ?n = 0
+      \end{leancode}
+    \end{onlyenv}
+    \begin{onlyenv}<3>
+      \begin{leancode}
+        ⊢ 0 < 42
+
+
+      \end{leancode}
+    \end{onlyenv}
+    \begin{onlyenv}<4>
+      \begin{leancode}
+        ✓
+
+
+      \end{leancode}
+    \end{onlyenv}
   \end{block}
-
-  \pause
 
   \begin{columns}[onlytextwidth]
     \begin{column}{.45\textwidth}
-      \begin{block}{... this works}
+      \begin{block}<2->{... this works}
         \begin{leancode}
           on_goal 2 => rfl
           decide
         \end{leancode}
       \end{block}
     \end{column}
-    \pause
+
     \begin{column}{.45\textwidth}
-      \begin{block}{... this doesn't}
+      \begin{block}<5->{... this doesn't}
         \begin{leancode}
           decide
           rfl
