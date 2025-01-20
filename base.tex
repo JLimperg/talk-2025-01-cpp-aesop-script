@@ -395,22 +395,16 @@
 \begin{frame}
   \frametitle{Optimiser Input}
 
-  \begin{definition}[Script step]
-    $(Φ^{\pre}, g^{\pre}, t, Φ^{\post}, G^{\post})$ where
-
-    \medskip
-
-    \begin{itemize}
-      \item $t$: tactic syntax (or tactic sequence syntax)
-      \item $Φ^{\pre}$: metavariable state before $t$
-      \item $g^{\pre}$: goal before $t$
-      \item $Φ^{\post}$: metavariable state before $t$
-      \item $G^{\post}$: goals after $t$
-    \end{itemize}
-  \end{definition}
-
   \begin{definition}[Naive script]
     List of script steps
+  \end{definition}
+
+  \begin{definition}[Script step]
+    \begin{itemize}
+      \item \emph{Syntax} of a tactic (or tactic sequence)
+      \item \emph{Pre-state}: state before the tactic was run by Aesop (goal + metavariable assignments)
+      \item \emph{Post-state}: state after the tactic was run by Aesop (goals + metavariable assignments)
+    \end{itemize}
   \end{definition}
 \end{frame}
 
@@ -433,31 +427,17 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Multi-Steps}
+  \frametitle{Local Dynamic Optimisation}
 
-  \begin{definition}[Multi-step]
-    $(Φ^{\pre}, g^{\pre}, [t₁, \dots, tₙ], Φ^{\post}, G^{\post})$ where
-    \medskip
-    \begin{itemize}
-      \item $t₁, \dots, tₙ$: tactic syntaxes
-    \end{itemize}
-  \end{definition}
+  Script steps can now contain \emph{multiple tactic syntaxes} $t₁, ..., tₙ$, e.g.
+  \begin{itemize}
+    \item \lean{simp_all only [ne_eq, head?]}
+    \item \lean{simp_all}
+  \end{itemize}
 
   \pause
 
-  For \lean{simp_all}: multi-step with tactics
-  \begin{itemize}
-    \item \lean{simp_all only [thm₁, ..., thmₘ]}
-    \item \lean{simp_all}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Local Dynamic Optimisation}
-
-  Given multi-step $(Φ^{\pre}, g^{\pre}, [t₁, \dots, tₙ], Φ^{\post}, G^{\post})$:
-
-  Use the \emph{first} tactic $tᵢ$ such that $tᵢ$, when run in state $Φ^{\pre}$ on goal $g^{\pre}$, produces state $Φ^{\post}$ and goals $G^{\post}$.
+  Use the \emph{first} tactic $tᵢ$ such that $tᵢ$, when run in the step's pre-state, produces the step's post-state.
 
   \pause
 
@@ -467,66 +447,73 @@
 \begin{frame}[fragile]
   \frametitle{Goal Equality Up To Renaming}
 
+  To decide whether a tactic produced the expected post-state:\\
+  compare the \emph{expected goals} with the \emph{actual goals} produced by the tactic.
+
+  \pause
+
   \begin{block}{Problem}
     Internal names of hypotheses and metavariables are unpredictable.
     \medskip
 
-    \begin{minipage}{.3\textwidth}
-      \begin{leancode}
-        l₁ l₂ : List α
-        x : l₁ ≠ []
-        ⊢ ...
-      \end{leancode}
-    \end{minipage}
-    $\xLongrightarrow{t₁}$
-    \begin{minipage}{.5\textwidth}
-      \begin{onlyenv}<1>
+    \begin{tabular}{lcl}
+      \begin{minipage}{.3\textwidth}
         \begin{leancode}
           l₁ l₂ : List α
-          x : ¬l₁ = []
+          x : l₁ ≠ []
           ⊢ ...
         \end{leancode}
-      \end{onlyenv}
-      \begin{onlyenv}<2->
-        \begin{leancode}
-          _uniq.1 _uniq.2 : List α
-          _uniq.3 : ¬_uniq.1 = []
-          ⊢ ...
-        \end{leancode}
-      \end{onlyenv}
-    \end{minipage}
-
-    \begin{minipage}{.3\textwidth}
-      \begin{leancode}
-        l₁ l₂ : List α
-        x : l₁ ≠ []
-        ⊢ ...
-      \end{leancode}
-    \end{minipage}
-    $\xLongrightarrow{t₂}$
-    \begin{minipage}{.5\textwidth}
-      \begin{onlyenv}<1>
+      \end{minipage}
+      & $\xLongrightarrow{\text{\lean{simp_all only ...}}}$ &
+      \begin{minipage}{.4\textwidth}
+        \begin{onlyenv}<2>
+          \begin{leancode}
+            l₁ l₂ : List α
+            x : ¬l₁ = []
+            ⊢ ...
+          \end{leancode}
+        \end{onlyenv}
+        \begin{onlyenv}<3->
+          \begin{leancode}
+            _uniq.1 _uniq.2 : List α
+            _uniq.3 : ¬_uniq.1 = []
+            ⊢ ...
+          \end{leancode}
+        \end{onlyenv}
+      \end{minipage}
+      \\
+      \begin{minipage}{.3\textwidth}
         \begin{leancode}
           l₁ l₂ : List α
-          x : ¬l₁ = []
+          x : l₁ ≠ []
           ⊢ ...
         \end{leancode}
-      \end{onlyenv}
-      \begin{onlyenv}<2->
-        \begin{leancode}
-          _uniq.4 _uniq.5 : List α
-          _uniq.6 : ¬_uniq.4 = []
-          ⊢ ...
-        \end{leancode}
-      \end{onlyenv}
-    \end{minipage}
+      \end{minipage}
+      & $\xLongrightarrow{\text{\lean{simp_all}}}$ &
+      \begin{minipage}{.4\textwidth}
+        \begin{onlyenv}<2>
+          \begin{leancode}
+            l₁ l₂ : List α
+            x : ¬l₁ = []
+            ⊢ ...
+          \end{leancode}
+        \end{onlyenv}
+        \begin{onlyenv}<3->
+          \begin{leancode}
+            _uniq.4 _uniq.5 : List α
+            _uniq.6 : ¬_uniq.4 = []
+            ⊢ ...
+          \end{leancode}
+        \end{onlyenv}
+      \end{minipage}
+    \end{tabular}
   \end{block}
 
-  \begin{onlyenv}<3>
+  \begin{visibleenv}<4>
     \begin{block}{Solution}
       Compare goals up to renaming.
     \end{block}
-  \end{onlyenv}
+  \end{visibleenv}
 \end{frame}
 
 \begin{frame}[fragile]
