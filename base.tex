@@ -459,7 +459,8 @@
     \begin{tabular}{lcl}
       \begin{minipage}{.3\textwidth}
         \begin{leancode}
-          l₁ l₂ : List α
+          l₁ : List α
+          l₂ : List α
           x : l₁ ≠ []
           ⊢ ...
         \end{leancode}
@@ -468,14 +469,16 @@
       \begin{minipage}{.4\textwidth}
         \begin{onlyenv}<2>
           \begin{leancode}
-            l₁ l₂ : List α
+            l₁ : List α
+            l₂ : List α
             x : ¬l₁ = []
             ⊢ ...
           \end{leancode}
         \end{onlyenv}
         \begin{onlyenv}<3->
           \begin{leancode}
-            _uniq.1 _uniq.2 : List α
+            _uniq.1 : List α
+            _uniq.2 : List α
             _uniq.3 : ¬_uniq.1 = []
             ⊢ ...
           \end{leancode}
@@ -484,7 +487,8 @@
       \\
       \begin{minipage}{.3\textwidth}
         \begin{leancode}
-          l₁ l₂ : List α
+          l₁ : List α
+          l₂ : List α
           x : l₁ ≠ []
           ⊢ ...
         \end{leancode}
@@ -493,14 +497,16 @@
       \begin{minipage}{.4\textwidth}
         \begin{onlyenv}<2>
           \begin{leancode}
-            l₁ l₂ : List α
+            l₁ : List α
+            l₂ : List α
             x : ¬l₁ = []
             ⊢ ...
           \end{leancode}
         \end{onlyenv}
         \begin{onlyenv}<3->
           \begin{leancode}
-            _uniq.4 _uniq.5 : List α
+            _uniq.4 : List α
+            _uniq.5 : List α
             _uniq.6 : ¬_uniq.4 = []
             ⊢ ...
           \end{leancode}
@@ -519,21 +525,74 @@
 \begin{frame}[fragile]
   \frametitle{Goal Equality Up To Renaming}
 
-  % TODO highlight types
   \begin{columns}[onlytextwidth]
     \begin{column}{.5\textwidth}
-      \begin{leancode}
-        _uniq.1 _uniq.2 : List α
-        _uniq.3 : ¬_uniq.1 = []
-        ⊢ ...
-      \end{leancode}
+      \begin{onlyenv}<1>
+        \begin{leancode}
+          _uniq.1 : List α
+          _uniq.2 : List α
+          _uniq.3 : ¬_uniq.1 = []
+          ⊢ ...
+        \end{leancode}
+      \end{onlyenv}
+      \begin{onlyenv}<2>
+        \begin{leancode}[highlightlines=1]
+          _uniq.1 : List α
+          _uniq.2 : List α
+          _uniq.3 : ¬_uniq.1 = []
+          ⊢ ...
+        \end{leancode}
+      \end{onlyenv}
+      \begin{onlyenv}<3>
+        \begin{leancode}[highlightlines=2]
+          _uniq.1 : List α
+          _uniq.2 : List α
+          _uniq.3 : ¬_uniq.1 = []
+          ⊢ ...
+        \end{leancode}
+      \end{onlyenv}
+      \begin{onlyenv}<4->
+        \begin{leancode}[highlightlines=3]
+          _uniq.1 : List α
+          _uniq.2 : List α
+          _uniq.3 : ¬_uniq.1 = []
+          ⊢ ...
+        \end{leancode}
+      \end{onlyenv}
     \end{column}
     \begin{column}{.5\textwidth}
-      \begin{leancode}
-        _uniq.4 _uniq.5 : List α
-        _uniq.6 : ¬_uniq.4 = []
-        ⊢ ...
-      \end{leancode}
+      \begin{onlyenv}<1>
+        \begin{leancode}
+          _uniq.4 : List α
+          _uniq.5 : List α
+          _uniq.6 : ¬_uniq.4 = []
+          ⊢ ...
+        \end{leancode}
+      \end{onlyenv}
+      \begin{onlyenv}<2>
+        \begin{leancode}[highlightlines=1]
+          _uniq.4 : List α
+          _uniq.5 : List α
+          _uniq.6 : ¬_uniq.4 = []
+          ⊢ ...
+        \end{leancode}
+      \end{onlyenv}
+      \begin{onlyenv}<3>
+        \begin{leancode}[highlightlines=2]
+          _uniq.4 : List α
+          _uniq.5 : List α
+          _uniq.6 : ¬_uniq.4 = []
+          ⊢ ...
+        \end{leancode}
+      \end{onlyenv}
+      \begin{onlyenv}<4>
+        \begin{leancode}[highlightlines=3]
+          _uniq.4 : List α
+          _uniq.5 : List α
+          _uniq.6 : ¬_uniq.4 = []
+          ⊢ ...
+        \end{leancode}
+      \end{onlyenv}
     \end{column}
   \end{columns}
 
