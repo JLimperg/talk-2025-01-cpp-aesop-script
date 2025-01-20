@@ -429,7 +429,7 @@
 \begin{frame}
   \frametitle{Local Dynamic Optimisation}
 
-  Script steps can now contain \emph{multiple tactic syntaxes} $t₁, ..., tₙ$, e.g.
+  Script steps can now contain \emph{multiple tactics}, e.g.
   \begin{itemize}
     \item \lean{simp_all only [ne_eq, head?]}
     \item \lean{simp_all}
@@ -437,11 +437,11 @@
 
   \pause
 
-  Use the \emph{first} tactic $tᵢ$ such that $tᵢ$, when run in the step's pre-state, produces the step's post-state.
+  Use the \emph{first} tactic that, when run in the step's pre-state, produces the step's post-state.
 
   \pause
 
-  The \emph{last} tactic $tₙ$ is assumed to satisfy this property and acts as a \emph{fallback}.
+  The \emph{last} tactic is assumed to satisfy this property and acts as a \emph{fallback}.
 \end{frame}
 
 \begin{frame}[fragile]
@@ -514,16 +514,14 @@
       \end{minipage}
     \end{tabular}
   \end{block}
-
-  \begin{visibleenv}<4>
-    \begin{block}{Solution}
-      Compare goals up to renaming.
-    \end{block}
-  \end{visibleenv}
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Goal Equality Up To Renaming}
+
+  \begin{block}{Solution}
+    Compare goals up to renaming.
+  \end{block}
 
   \begin{columns}[onlytextwidth]
     \begin{column}{.5\textwidth}
