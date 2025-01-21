@@ -366,33 +366,6 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Background: Metavariables}
-
-  a.k.a.\ existential variables, schematic variables, free variables
-
-  $λ\, (x~y : ℕ),\; x + y = \purple{\mvar{z}}$
-
-  \pause
-
-  $\purple{\mvar{z}}$ is a \emph{hole} in the term.
-
-  \pause
-
-  $\purple{\mvar{z}}$ is \emph{typed}: $x, y : ℕ ⊢ \purple{\mvar{z}} : ℕ$
-
-  \pause
-
-  \emph{Assigning} e.g.\ $\purple{\mvar{z}} ≔ \green{0}$ changes the term:
-  \[
-    λ (x~y : ℕ),\; x + y = \green{0}
-  \]
-
-  \pause
-
-  We can also view $\purple{\mvar{z}}$ as a \emph{goal} of type $ℕ$ with hypotheses $x, y : ℕ$.
-\end{frame}
-
-\begin{frame}
   \frametitle{Optimiser Input}
 
   \begin{definition}[Naive script]
@@ -402,8 +375,8 @@
   \begin{definition}[Script step]
     \begin{itemize}
       \item \emph{Syntax} of a tactic (or tactic sequence)
-      \item \emph{Pre-state}: state before the tactic was run by Aesop (goal + metavariable assignments)
-      \item \emph{Post-state}: state after the tactic was run by Aesop (goals + metavariable assignments)
+      \item \emph{Pre-state}: \emph{state} before the tactic was run by Aesop and \emph{goal} on which it was run
+      \item \emph{Post-state}: \emph{state} after the tactic was run by Aesop and \emph{goals} it produced
     \end{itemize}
   \end{definition}
 \end{frame}
@@ -453,7 +426,7 @@
   \pause
 
   \begin{block}{Problem}
-    Internal names of hypotheses and metavariables are unpredictable.
+    Internal names of hypotheses (and metavariables) are unpredictable.
     \medskip
 
     \begin{tabular}{lcl}
